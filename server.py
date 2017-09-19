@@ -31,8 +31,8 @@ class BasicServer(object):
                     try:
                         self.s_to_msg[socket] += socket.recv(1024)
                         if len(self.s_to_msg[socket]) >= 200:
-                            msg = (self.s_to_msg[socket]).rstrip()
-                            self.s_to_msg[socket] = ""
+                            msg = (self.s_to_msg[socket][:200]).rstrip()
+                            self.s_to_msg[socket] = self.s_to_msg[socket][200:]
                             # case 2.1: new client 1st msg ==  client name
                             if self.new_client:
                                 self.s_to_info[socket] = [msg, None]
@@ -105,7 +105,7 @@ class BasicServer(object):
         msg = msg.ljust(utils.MESSAGE_LENGTH)
         for s in sockets:
             if s is not self.socket:
-                s.send(msg)
+                s.sendall(msg)
 
 
 # handle command line input

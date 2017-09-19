@@ -18,7 +18,7 @@ class BasicClient(object):
             print(utils.CLIENT_CANNOT_CONNECT.format(self.address, self.port))
             sys.exit()
         self.socket_lst = [self.socket, sys.stdin]
-        self.socket.send(name.ljust(utils.MESSAGE_LENGTH))
+        self.socket.sendall(name.ljust(utils.MESSAGE_LENGTH))
         sys.stdout.write(utils.CLIENT_MESSAGE_PREFIX); sys.stdout.flush()
 
     def start(self):
@@ -29,15 +29,15 @@ class BasicClient(object):
                 if socket is sys.stdin:
                     msg = sys.stdin.readline()
                     msg = msg.ljust(utils.MESSAGE_LENGTH)
-                    self.socket.send(msg)
+                    self.socket.sendall(msg)
                     sys.stdout.write(utils.CLIENT_MESSAGE_PREFIX); sys.stdout.flush()
                 # case 2: from server socket
                 else:
                     try:
                         self.server_msg += socket.recv(1024)
                         if len(self.server_msg) >= 200:
-                            msg = self.server_msg.rstrip()
-                            self.server_msg = ""
+                            msg = self.server_msg[:200].rstrip()
+                            self.server_msg = self.server_msg[200:]
                             # msg from other clients 
                             if msg and msg[0] == '[':
                                 name_index = 0
